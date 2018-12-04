@@ -1,16 +1,12 @@
-package com.zxs.ssh.template.controller;
+package com.zxs.ssh.template.controller.selenium;
 
-import com.zxs.ssh.template.util.BlogParseUtil;
 import com.zxs.ssh.template.util.RequestUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * Project Name:weibo-crawler
@@ -18,7 +14,7 @@ import java.util.List;
  * Package Name:com.zxs.ssh.template.controller
  * Date:2018/11/16
  * Author:zengxueshan
- * Description:爬取用户信息
+ * Description:通过selenium爬取用户信息
  * Copyright (c) 2018, 重庆云凯科技有限公司 All Rights Reserved.
  */
 

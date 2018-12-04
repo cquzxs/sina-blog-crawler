@@ -1,4 +1,4 @@
-package com.zxs.ssh.template.controller;
+package com.zxs.ssh.template.controller.selenium;
 
 import com.zxs.ssh.template.util.RequestUtil;
 import org.openqa.selenium.By;
@@ -18,7 +18,7 @@ import java.util.List;
  * Package Name:com.zxs.ssh.template.controller
  * Date:2018/11/21
  * Author:zengxueshan
- * Description:爬取网页，获取IP代理池
+ * Description:通过selenium爬取网页，获取IP代理池
  * Copyright (c) 2018, 重庆云凯科技有限公司 All Rights Reserved.
  */
 

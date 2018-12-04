@@ -1,4 +1,4 @@
-package com.zxs.ssh.template.controller;
+package com.zxs.ssh.template.controller.selenium;
 
 import com.zxs.ssh.template.util.BlogParseUtil;
 import com.zxs.ssh.template.util.ConversionUtil;
@@ -20,7 +20,7 @@ import java.util.List;
  * Package Name:com.zxs.ssh.template.controller
  * Date:2018/11/20
  * Author:zengxueshan
- * Description: 爬取用户博客内容及其转发数、评论数、点赞数(新增获取每条博客地址)
+ * Description: 通过selenium爬取用户博客内容及其转发数、评论数、点赞数(新增获取每条博客地址)
  * Copyright (c) 2018, 重庆云凯科技有限公司 All Rights Reserved.
  */
 
