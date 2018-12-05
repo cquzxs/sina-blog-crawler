@@ -34,4 +34,16 @@ public class ThreadInfoController {
         return res;
     }
 
+    /**
+     * 停止多线程爬取用户信息
+     *
+     * @return 用户信息
+     */
+    @RequestMapping("thread/stopCrawlerInfo")
+    public String stopCrawlerInfo(){
+        String res = "ok";
+        this.crawlerInfoService.crawlerInfo();
+        return res;
+    }
+
 }

@@ -1,6 +1,9 @@
 package com.zxs.ssh.template.thread;
 
 import com.zxs.ssh.template.model.BlogUserInfoModel;
+import com.zxs.ssh.template.model.Queue.IpQueue;
+import com.zxs.ssh.template.model.Queue.UserInfoModelQueue;
+import com.zxs.ssh.template.model.Queue.UserInfoUrlQueue;
 import com.zxs.ssh.template.service.info.api.IBlogUserInfoService;
 import com.zxs.ssh.template.util.IpProxyUtil;
 import org.json.JSONObject;
@@ -30,14 +33,13 @@ import java.util.concurrent.TimeUnit;
 public class CrawlerInfoThread implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(CrawlerInfoThread.class);
-    //初始用户网页，通过其关注的人和评论的人不断迭代(https://m.weibo.cn/u/1195230310)
+    //初始用户信息接口地址，通过其关注的人和评论的人不断迭代(主页：https://m.weibo.cn/u/1195230310)
     private static final String originUrl = "https://m.weibo.cn/api/container/getIndex?type=uid&value=1195230310&containerid=1005051195230310";
-    private static final LinkedBlockingQueue<String> userInfoUrlQueue = new LinkedBlockingQueue<>(); //用户主页url队列
-    public static List<String> userInfoUrlList = Collections.synchronizedList(new ArrayList<>()); //用户主页url列表，用于去重
     private boolean isBreakdown = false; //线程是否崩溃
+    private static final int MAX_IP_COUNT = 100;//每个IP处理任务的最大值
+    private static final long QUEUE_PULL_TIME_OUT = 5000;//出队超时时间
     private int ipCount = 0;//处理10个任务换一个ip
     private String ip = "219.234.5.128:3128"; //当前使用的代理ip
-    private static int saveCount = 0;
 
     private IBlogUserInfoService blogUserInfoService;
 
@@ -51,9 +53,9 @@ public class CrawlerInfoThread implements Runnable {
     @Override
     public void run() {
         try {
-            if(!userInfoUrlList.contains(originUrl)){
-                userInfoUrlList.add(originUrl);
-                userInfoUrlQueue.put(originUrl);
+            if(!UserInfoUrlQueue.userInfoUrlList.contains(originUrl)){
+                UserInfoUrlQueue.userInfoUrlList.add(originUrl);
+                UserInfoUrlQueue.push(originUrl);
             }
         } catch (Exception e) {
             logger.info("初始化失败");
@@ -61,15 +63,14 @@ public class CrawlerInfoThread implements Runnable {
         while (!isBreakdown) {
             try {
                 Thread.sleep(10 * 1000);
-                System.out.println("爬取用户信息线程等待10秒");
-                while (userInfoUrlQueue.size() > 0 && IpProxyThread.getQueueCount() > 0) {
-                    if (ipCount >= 10) {
-                        ip = IpProxyThread.pull(5000);
+                while (UserInfoUrlQueue.getQueueCount() > 0 && IpQueue.getQueueCount() > 0) {
+                    if (ipCount >= MAX_IP_COUNT) {
+                        ip = IpQueue.pull(QUEUE_PULL_TIME_OUT).getIp();
                     }
                     if (ip == null) {
                         return;
                     }
-                    String url = pull(5000);
+                    String url = UserInfoUrlQueue.pull(QUEUE_PULL_TIME_OUT);
                     if (url == null) {
                         return;
                     }
@@ -82,13 +83,7 @@ public class CrawlerInfoThread implements Runnable {
                     }
                     if (document != null) {
                         getUserInfo(document);
-                        saveCount++;
                     }
-                    System.out.println("*************爬取用户信息线程当前代理ip:" + ip+"***************");
-                    System.out.println("已爬取得用户数：" + userInfoUrlList.size());
-                    System.out.println("剩余任务数：" + userInfoUrlQueue.size());
-                    System.out.println("剩余代理ip数:" + IpProxyThread.getQueueCount());
-                    System.out.println("已存储到数据库用户数：" + saveCount);
                     ipCount++;
                 }
             } catch (Exception e) {
@@ -96,6 +91,7 @@ public class CrawlerInfoThread implements Runnable {
                 isBreakdown = true;
             }
         }
+        logger.info("爬取用户信息线程已停止");
     }
 
     /**
@@ -114,7 +110,7 @@ public class CrawlerInfoThread implements Runnable {
             try{
                 blogUserInfoModel.setIntroduce(userInfoJsonObject.get("verified_reason").toString());//很多用户没有认证信息
             }catch (Exception e){
-
+                //logger.info(blogUserInfoModel.getId()+" 用户无认证信息");
             }
             blogUserInfoModel.setBlogLevel(Integer.parseInt(userInfoJsonObject.get("urank").toString()));
             blogUserInfoModel.setFollowCount(Integer.parseInt(userInfoJsonObject.get("follow_count").toString()));
@@ -123,30 +119,13 @@ public class CrawlerInfoThread implements Runnable {
             blogUserInfoModel.setCreateTime(new Timestamp(System.currentTimeMillis()));
             blogUserInfoModel.setUpdateTime(new Timestamp(System.currentTimeMillis()));
             this.blogUserInfoService.saveModel(blogUserInfoModel);
-            CrawlerFollowListThread.push(blogUserInfoModel);
+            UserInfoModelQueue.push(blogUserInfoModel);
         } catch (Exception e) {
             logger.info("用户信息获取失败", e);
         }
     }
 
-    /**
-     * 入队
-     *
-     * @param url 用户主页url
-     * @throws Exception 异常
-     */
-    public static void push(String url) throws Exception {
-        userInfoUrlQueue.put(url);
-    }
-
-    /**
-     * 出队
-     *
-     * @param timeout 超时时间
-     * @return url
-     * @throws Exception 异常
-     */
-    public static String pull(long timeout) throws Exception {
-        return userInfoUrlQueue.poll(timeout, TimeUnit.MILLISECONDS);
+    public void setBreakdown(boolean breakdown) {
+        isBreakdown = breakdown;
     }
 }
