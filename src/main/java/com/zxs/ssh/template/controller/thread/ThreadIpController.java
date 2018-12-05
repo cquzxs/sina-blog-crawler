@@ -39,10 +39,10 @@ public class ThreadIpController {
      *
      * @return 结果
      */
-    @RequestMapping("thread/endCrawlerIp")
+    @RequestMapping("thread/stopCrawlerIp")
     public String endCrawlerIp(){
         String res = "ok";
-        this.crawlerIpService.endCrawlerIp();
+        this.crawlerIpService.stopCrawlerIp();
         return res;
     }
 }

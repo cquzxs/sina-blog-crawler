@@ -21,6 +21,6 @@ public interface ICrawlerIpService {
     /**
      * 停止爬取代理IP
      */
-    void endCrawlerIp();
+    void stopCrawlerIp();
 
 }

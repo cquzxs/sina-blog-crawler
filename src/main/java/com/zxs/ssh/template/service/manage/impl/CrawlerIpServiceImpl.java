@@ -37,7 +37,7 @@ public class CrawlerIpServiceImpl implements ICrawlerIpService{
      * 停止爬取代理IP
      */
     @Override
-    public void endCrawlerIp() {
+    public void stopCrawlerIp() {
         if(ipProxyThread != null){
             ipProxyThread.setBreakdown(true);
         }

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * Project Name:weibo-crawler
@@ -50,13 +51,19 @@ public class CrawlerIpThread implements Runnable {
             IpProxyModel ipProxyModel = new IpProxyModel();
             ipProxyModel.setIp(ip);
             IpQueue.push(ipProxyModel);
+            List<IpProxyModel> ipProxyModels = this.ipProxyService.queryModels(0,100);
+            if(ipProxyModels != null && !ipProxyModels.isEmpty()){
+                for (int i = 0; i < ipProxyModels.size(); i++) {
+                    IpQueue.push(ipProxyModels.get(i));
+                }
+            }
         } catch (Exception e) {
             logger.info("初始化失败");
         }
         while (!isBreakdown) {
             try {
                 Thread.sleep(10 * 1000);
-                while (IpQueue.getQueueCount() > 0) {
+                while (IpQueue.getQueueCount() > 0 && !isBreakdown) {
                     if (ipCount >= MAX_IP_COUNT) {
                         ip = IpQueue.pull(QUEUE_PULL_TIME_OUT).getIp();
                     }
@@ -82,6 +89,7 @@ public class CrawlerIpThread implements Runnable {
                         }
                         ipProxyModel.setResponseSpeed(responseTime + "ms");
                         this.ipProxyService.saveModel(ipProxyModel);
+                        IpQueue.push(ipProxyModel);
                     }
                     try {
                         Elements pageCountElements = document.selectFirst(".pagination").select("a");

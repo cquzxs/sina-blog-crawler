@@ -13,11 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Project Name:weibo-crawler
@@ -63,7 +58,7 @@ public class CrawlerInfoThread implements Runnable {
         while (!isBreakdown) {
             try {
                 Thread.sleep(10 * 1000);
-                while (UserInfoUrlQueue.getQueueCount() > 0 && IpQueue.getQueueCount() > 0) {
+                while (UserInfoUrlQueue.getQueueCount() > 0 && IpQueue.getQueueCount() > 0 && !isBreakdown) {
                     if (ipCount >= MAX_IP_COUNT) {
                         ip = IpQueue.pull(QUEUE_PULL_TIME_OUT).getIp();
                     }

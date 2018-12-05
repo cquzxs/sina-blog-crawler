@@ -12,9 +12,6 @@ import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-
 /**
  * Project Name:blog-crawler
  * File Name:CrawlerFollowListThread
@@ -44,7 +41,7 @@ public class CrawlerFollowListThread implements Runnable{
         while (!isBreakdown) {
             try {
                 Thread.sleep(10*1000);
-                while (UserInfoModelQueue.getQueueCount() > 0 && IpQueue.getQueueCount() > 0){
+                while (UserInfoModelQueue.getQueueCount() > 0 && IpQueue.getQueueCount() > 0 && !isBreakdown){
                     if(ipCount >= MAX_IP_COUNT){
                         ip = IpQueue.pull(QUEUE_PULL_TIME_OUT).getIp();
                     }
@@ -83,6 +80,7 @@ public class CrawlerFollowListThread implements Runnable{
                 document = Jsoup.connect(url).ignoreContentType(true).timeout(200000).data().get();
             } catch (Exception e) {
                 logger.info("请求url异常");
+                break;
             }
             if (document != null) {
                 try {

@@ -42,7 +42,7 @@ public class ThreadInfoController {
     @RequestMapping("thread/stopCrawlerInfo")
     public String stopCrawlerInfo(){
         String res = "ok";
-        this.crawlerInfoService.crawlerInfo();
+        this.crawlerInfoService.stopCrawlerInfo();
         return res;
     }
 
