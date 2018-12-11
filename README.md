@@ -13,7 +13,7 @@ Java实现新浪微博爬虫
 2. jsoup + api
 
 多线程
-1. jsoup + api
+1. jsoup + api + ip代理
 
 
 有问题欢迎随时交流，联系邮箱：1501873102@qq.com
