@@ -22,6 +22,8 @@ public class ThreadInfoController {
     @Resource(name = "crawlerInfoService")
     private ICrawlerInfoService crawlerInfoService;
 
+    private static boolean isRunning = false;
+
     /**
      * 多线程爬取用户信息
      *
@@ -30,7 +32,11 @@ public class ThreadInfoController {
     @RequestMapping("thread/crawlerInfo")
     public String crawlerInfo(){
         String res = "ok";
+        if(isRunning){
+            return res;
+        }
         this.crawlerInfoService.crawlerInfo();
+        isRunning = true;
         return res;
     }
 
@@ -42,7 +48,11 @@ public class ThreadInfoController {
     @RequestMapping("thread/stopCrawlerInfo")
     public String stopCrawlerInfo(){
         String res = "ok";
+        if(!isRunning){
+            return res;
+        }
         this.crawlerInfoService.stopCrawlerInfo();
+        isRunning = false;
         return res;
     }
 

@@ -22,6 +22,8 @@ public class ThreadIpController {
     @Resource(name = "crawlerIpService")
     private ICrawlerIpService crawlerIpService;
 
+    private static boolean isRunning = false;
+
     /**
      * 爬取代理IP，并将代理IP存入数据库
      *
@@ -30,7 +32,11 @@ public class ThreadIpController {
     @RequestMapping("thread/crawlerIp")
     public String crawlerIp(){
         String res = "ok";
+        if(isRunning){
+            return res;
+        }
         this.crawlerIpService.crawlerIp();
+        isRunning = true;
         return res;
     }
 
@@ -42,7 +48,11 @@ public class ThreadIpController {
     @RequestMapping("thread/stopCrawlerIp")
     public String endCrawlerIp(){
         String res = "ok";
+        if(!isRunning){
+            return res;
+        }
         this.crawlerIpService.stopCrawlerIp();
+        isRunning = false;
         return res;
     }
 }

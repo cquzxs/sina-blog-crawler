@@ -6,6 +6,7 @@ import com.zxs.ssh.template.model.Queue.UserInfoModelQueue;
 import com.zxs.ssh.template.model.Queue.UserInfoUrlQueue;
 import com.zxs.ssh.template.service.info.api.IBlogUserInfoService;
 import com.zxs.ssh.template.util.IpProxyUtil;
+import com.zxs.ssh.template.util.RandomTimeUtil;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -74,12 +75,13 @@ public class CrawlerInfoThread implements Runnable {
                     try {
                         document = Jsoup.connect(url).ignoreContentType(true).timeout(200000).data().get();
                     } catch (Exception e) {
-                        logger.info("请求url异常");
+                        logger.info("请求url异常",e);
                     }
                     if (document != null) {
                         getUserInfo(document);
                     }
                     ipCount++;
+                    Thread.sleep(RandomTimeUtil.randomTime());
                 }
             } catch (Exception e) {
                 logger.info("爬取用户信息异常", e);

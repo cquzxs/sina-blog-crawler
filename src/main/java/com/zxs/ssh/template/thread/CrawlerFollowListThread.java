@@ -5,6 +5,7 @@ import com.zxs.ssh.template.model.Queue.IpQueue;
 import com.zxs.ssh.template.model.Queue.UserInfoModelQueue;
 import com.zxs.ssh.template.model.Queue.UserInfoUrlQueue;
 import com.zxs.ssh.template.util.IpProxyUtil;
+import com.zxs.ssh.template.util.RandomTimeUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -55,6 +56,7 @@ public class CrawlerFollowListThread implements Runnable{
                     IpProxyUtil.setIpProxy(ip);
                     getFollowList(blogUserInfoModel);
                     ipCount++;
+                    Thread.sleep(RandomTimeUtil.randomTime());
                 }
             } catch (Exception e) {
                 logger.info("爬取用户关注列表异常", e);
@@ -79,7 +81,7 @@ public class CrawlerFollowListThread implements Runnable{
             try {
                 document = Jsoup.connect(url).ignoreContentType(true).timeout(200000).data().get();
             } catch (Exception e) {
-                logger.info("请求url异常");
+                logger.info("请求url异常",e);
                 break;
             }
             if (document != null) {
